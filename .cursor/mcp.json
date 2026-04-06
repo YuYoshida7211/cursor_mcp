@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "figma-developer-mcp": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "figma-developer-mcp",
+        "--stdio"
+      ],
+      "envFile": "${workspaceFolder}/.env"
+    }
+  }
+}

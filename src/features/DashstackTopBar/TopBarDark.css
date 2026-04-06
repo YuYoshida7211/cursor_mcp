@@ -1,0 +1,212 @@
+/* DashStack — Navigation / Top Bar #2 Dark（Figma 0:40870）トークン */
+.top-bar-dark {
+  width: 100%;
+  text-align: start;
+  --topbar-bg: #273142;
+  --topbar-search-fg: rgba(255, 255, 255, 0.8);
+  --topbar-search-icon: rgba(255, 255, 255, 0.5);
+  --topbar-search-placeholder: rgba(255, 255, 255, 0.5);
+  --topbar-accent: #f93c65;
+  --topbar-accent-soft: rgba(249, 60, 101, 0.35);
+  --topbar-profile-name: #f0f0f0;
+  --topbar-profile-role: rgba(255, 255, 255, 0.55);
+  --topbar-icon: #ffffff;
+  --topbar-chevron-border: rgba(255, 255, 255, 0.22);
+  --topbar-height: 70px;
+  --topbar-avatar: 44px;
+
+  font-family: 'Nunito Sans', var(--sans);
+  background: var(--topbar-bg);
+  color: var(--topbar-icon);
+  min-height: var(--topbar-height);
+  box-sizing: border-box;
+}
+
+.top-bar-dark *,
+.top-bar-dark *::before,
+.top-bar-dark *::after {
+  box-sizing: border-box;
+}
+
+.top-bar-dark__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: var(--topbar-height);
+  padding: 0 24px;
+  max-width: 100%;
+}
+
+.top-bar-dark__search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+  max-width: 320px;
+}
+
+.top-bar-dark__search-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.top-bar-dark__search-icon {
+  display: flex;
+  color: var(--topbar-search-icon);
+  flex-shrink: 0;
+}
+
+.top-bar-dark__search-input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  color: var(--topbar-search-fg);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.36;
+  outline: none;
+}
+
+.top-bar-dark__search-input::placeholder {
+  color: var(--topbar-search-placeholder);
+  opacity: 1;
+}
+
+.top-bar-dark__actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-shrink: 0;
+}
+
+.top-bar-dark__notify {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--topbar-icon);
+  cursor: pointer;
+}
+
+.top-bar-dark__notify:focus-visible {
+  outline: 2px solid var(--topbar-accent);
+  outline-offset: 2px;
+}
+
+.top-bar-dark__notify-icon {
+  display: flex;
+  opacity: 0.9;
+}
+
+.top-bar-dark__notify-badge {
+  position: absolute;
+  top: 6px;
+  right: 4px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: var(--topbar-accent);
+  box-shadow: 0 0 0 2px var(--topbar-accent-soft);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  color: #fff;
+}
+
+.top-bar-dark__profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: inherit;
+  text-align: left;
+}
+
+.top-bar-dark__profile:focus-visible {
+  outline: 2px solid var(--topbar-accent);
+  outline-offset: 4px;
+  border-radius: 8px;
+}
+
+.top-bar-dark__avatar {
+  width: var(--topbar-avatar);
+  height: var(--topbar-avatar);
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.top-bar-dark__profile-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.top-bar-dark__profile-name {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.36;
+  color: var(--topbar-profile-name);
+}
+
+.top-bar-dark__profile-role {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.36;
+  color: var(--topbar-profile-role);
+}
+
+.top-bar-dark__chevron-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--topbar-chevron-border);
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.top-bar-dark__chevron {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+@media (max-width: 640px) {
+  .top-bar-dark__inner {
+    padding: 0 16px;
+    gap: 12px;
+  }
+
+  .top-bar-dark__profile-text {
+    display: none;
+  }
+
+  .top-bar-dark__chevron-wrap {
+    display: none;
+  }
+}

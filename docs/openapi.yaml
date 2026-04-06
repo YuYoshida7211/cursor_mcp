@@ -1,0 +1,124 @@
+openapi: 3.1.0
+
+info:
+  title: AI Driven Dev Demo API
+  version: 0.1.0
+  description: |
+    管理画面デモ用の REST API 仕様。
+    開発時は MSW（`src/mocks/handlers/`）がこの仕様に従ってモックを返す。
+
+servers:
+  - url: /api
+    description: "同一オリジン（開発: MSW / 本番: バックエンド）"
+
+tags:
+  - name: users
+    description: 社員（ユーザー）情報
+
+paths:
+  /users:
+    get:
+      operationId: getUsers
+      summary: ユーザー一覧取得
+      description: 全社員の情報を配列で返す。
+      tags:
+        - users
+      responses:
+        "200":
+          description: 取得成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetUsersResponse"
+              example:
+                users:
+                  - employeeId: E-1001
+                    name: 山田 太郎
+                    age: 34
+                    address: 東京都渋谷区本町1-2-3
+                    group: エンジニア
+                    hireDate: "2018-04-01"
+                    phone: 090-1111-2222
+                    note: フロントエンド担当
+        "500":
+          description: サーバーエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+components:
+  schemas:
+
+    UserGroup:
+      type: string
+      enum:
+        - エンジニア
+        - 経理
+        - 営業
+      description: 所属グループ
+
+    User:
+      type: object
+      required:
+        - employeeId
+        - name
+        - age
+        - address
+        - group
+        - hireDate
+        - phone
+        - note
+      properties:
+        employeeId:
+          type: string
+          description: 社員番号
+          example: E-1001
+        name:
+          type: string
+          description: 氏名
+          example: 山田 太郎
+        age:
+          type: integer
+          minimum: 0
+          description: 年齢
+          example: 34
+        address:
+          type: string
+          description: 住所
+          example: 東京都渋谷区本町1-2-3
+        group:
+          $ref: "#/components/schemas/UserGroup"
+        hireDate:
+          type: string
+          format: date
+          description: 雇用年月日（YYYY-MM-DD）
+          example: "2018-04-01"
+        phone:
+          type: string
+          description: 連絡先（電話番号）
+          example: 090-1111-2222
+        note:
+          type: string
+          description: 備考
+          example: フロントエンド担当
+
+    GetUsersResponse:
+      type: object
+      required:
+        - users
+      properties:
+        users:
+          type: array
+          items:
+            $ref: "#/components/schemas/User"
+
+    ErrorResponse:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          description: エラーメッセージ
+          example: Internal Server Error

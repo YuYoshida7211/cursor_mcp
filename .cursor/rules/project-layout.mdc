@@ -1,0 +1,13 @@
+---
+description: リポジトリ構成（Rules / MCP の置き場所）
+alwaysApply: true
+---
+
+# リポジトリ構成
+
+- **Cursor Rules**: `.cursor/rules/*.mdc`（フロントマターで `globs` / `alwaysApply` を指定）
+  - 本プロジェクトの **管理画面・AI 生成ルール**は **`rules.mdc`** に集約（`alwaysApply: true`）。チャットで従った場合は応答末尾に `cursor/rules.mdc 参照`
+- **MCP（このリポジトリ）**: `.cursor/mcp.json` にサーバー定義を置く。雛形は `.cursor/mcp.json.example`
+- **Figma（`figma-developer-mcp`）**: [Zenn の手順](https://zenn.dev/takna/articles/mcp-server-tutorial-06-figma) どおり `npx figma-developer-mcp` を使う場合、**Personal access token はプロジェクト直下の `.env` に `FIGMA_API_KEY=...` と書く**（`.cursor/mcp.json` の `envFile` が読む。`.env` は gitignore 済み）。**`.cursor/mcp.json` の `env` にトークンを直書きしない**（GitHub の Push Protection / secret scanning に弾かれる）。**トークンをチャット・Issue・リポジトリに書かない**。漏れたら Figma で **Revoke** して再発行する。
+- **Cursor で MCP の UI を開く**: メニューに「Settings → MCP」が無い場合がある。**`Cmd+Shift+J`（Windows は `Ctrl+Shift+J`）** で設定を開き、**Features → Model Context Protocol** を探す。または **Command Palette**（`Cmd+Shift+P`）で「MCP」と検索。設定が見つからないときは **[Cursor MCP 公式ドキュメント](https://cursor.com/docs/context/mcp)** を参照。
+- **グローバル MCP**（全プロジェクト共通）: ユーザーの Cursor 設定内の MCP（環境により `~/.cursor/mcp.json` など）。プロジェクトと重複する場合は Cursor のマージ仕様に従う

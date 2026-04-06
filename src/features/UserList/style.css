@@ -1,0 +1,85 @@
+.user-list {
+  width: 100%;
+  padding: 24px 24px 40px;
+  box-sizing: border-box;
+}
+
+.user-list__container {
+  width: 100%;
+  max-width: 1126px;
+  margin: 0 auto;
+}
+
+.user-list__title {
+  margin: 0 0 16px;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-h);
+  font-family: var(--heading);
+  text-align: left;
+}
+
+.user-list__tableWrap {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: transparent;
+}
+
+.user-list__table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 980px;
+}
+
+.user-list__caption {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.user-list__table th,
+.user-list__table td {
+  border-bottom: 1px solid var(--border);
+  padding: 12px 12px;
+  text-align: left;
+  vertical-align: top;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.user-list__table thead th {
+  background: rgba(0, 0, 0, 0.03);
+  font-weight: 700;
+  color: var(--text-h);
+}
+
+@media (prefers-color-scheme: dark) {
+  .user-list__table thead th {
+    background: rgba(255, 255, 255, 0.04);
+  }
+}
+
+.user-list__table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.user-list__state {
+  margin: 0;
+  padding: 24px 0;
+  font-size: 14px;
+  color: var(--text);
+  text-align: center;
+}
+
+.user-list__state--error {
+  color: #e53935;
+}
+

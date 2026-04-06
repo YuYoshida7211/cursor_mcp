@@ -1,0 +1,287 @@
+---
+description: Vite + React 管理画面の AI 生成・編集ルール（細粒度・単一ファイル）
+alwaysApply: true
+---
+
+以下の指示に従ってください。
+
+**チャット応答**: 本ルールに従って処理した場合は、**応答の最後に** `cursor/rules.mdc 参照` を入れる。
+
+あなたはフロントエンドに特化したシニアエンジニアとして振る舞う。**TypeScript + React（Vite SPA）**で、モダンで保守しやすいコードを生成する。設計や既存コードと矛盾する場合は **既存コードと本ファイルを優先**する。
+
+---
+
+## 技術スタック（このリポジトリ）
+
+| 項目                   | 値                                                     |
+| ---------------------- | ------------------------------------------------------ |
+| ビルド                 | Vite 8.x                                               |
+| フレームワーク         | React 19.x（クライアント中心 SPA。RSC は使用しない）   |
+| 言語                   | TypeScript 5.9.x（`strict`）                           |
+| パッケージマネージャー | npm（`package-lock.json`）                             |
+| Lint                   | ESLint 9 + typescript-eslint + react-hooks             |
+| API モック（開発）     | MSW 2.x（`src/mocks/`、`public/mockServiceWorker.js`） |
+
+※ React Router・データ取得ライブラリ・UI ライブラリ・テストは **未導入のことがある**。導入済みの依存のみ使い、未導入のものが必要なら **追加を提案**し、ルールの精神に沿って実装する。
+
+---
+
+## ファイル構造（目標形・管理画面）
+
+新規追加は次の置き場所に寄せる。既存の `App.tsx` / `main.tsx` はエントリとして維持し、段階的に分割する。
+
+```plaintext
+src/
+├── app/                    # アプリシェル・ルート定義（ルータ導入後）
+├── features/               # 機能単位（一覧・詳細・設定など）
+│   └── <FeatureName>/
+├── component/              # 共通コンポーネント（複数機能横断）
+│   ├── layout/             # レイアウト
+│   ├── modals/             # モーダル
+│   └── ui/                 # 汎用 UI プリミティブ
+├── constants/              # 定数・設定・色トークン（導入後）
+├── context/                # React Context（導入後）
+├── hooks/                  # カスタムフック
+├── styles/                 # グローバル・トークン（導入後）
+├── theme/                  # テーマ（導入後）
+├── types/                  # 共有型
+├── utils/                  # ユーティリティ・API クライアント層（`utils/api`）
+├── mocks/                  # MSW（開発時モック、`handlers/` は API ごとに分割可）
+├── assets/                 # 画像・SVG
+├── App.tsx
+├── App.css / index.css
+└── main.tsx
+public/
+tests/                      # テスト（Vitest 等導入後）
+```
+
+### ディレクトリ設計の思想
+
+- **縦の軸＝機能（feature）**: 業務・画面のまとまりは `features/<kebab-name>/` に置く。**ドメイン境界 ≒ フォルダ境界**とし、新規はまずここで完結させる。チーム分割・削除・権限の切り出しがしやすい。
+- **横の軸＝共有（薄いレイヤ）**: 複数 feature にまたがるものだけ `component/`・`hooks/`（汎用）・`constants`・`types`・`utils/api`・`context` に昇格させる。**横断 concern の乱立を避け**、本当に再利用されるものだけを中央へ寄せる。
+- **`app/` はアプリケーションシェル**: Next.js の App Router ではない。**ルート定義・ルートレイアウト・認証ガードの束ね**（React Router 等導入後）を置く想定。クライアント中心 SPA の「骨格」。
+- **`component/` は厳しめ**: 上記「共通コンポーネントの基準」を満たす **プレゼンテーション寄りの部品**のみ。業務ロジック・API・ドメイン文言は **feature 側**に置く。再利用が 2 回目で固まったら `component/ui` 等へ **内側（feature）から外側（共有）へ移す**のが基本。
+- **API 境界**: 生の `fetch` をコンポーネントに散らさず、`utils/api` の単一入口と型（`types` または feature コロケーション）で **バックエンド契約**と向き合う。
+- **見た目の単一源泉**: 色・余白・文言のルールは `constants` / `theme` / `styles`（＋既存のグローバル CSS）に寄せ、コンポーネント内のマジックナンバー・Hex 直書きを避ける。
+
+---
+
+## 命名規則
+
+### ファイル名
+
+| 種別                          | 規則                                                | 例                     |
+| ----------------------------- | --------------------------------------------------- | ---------------------- |
+| ページ相当（ルート単位の UI） | kebab-case ディレクトリ + `page.tsx` 等             | `features/user-list/`  |
+| React コンポーネント          | PascalCase                                          | `UserProfile.tsx`      |
+| フック                        | `use` + camelCase                                   | `useUserData.ts`       |
+| ユーティリティ                | camelCase ファイル                                  | `formatDate.ts`        |
+| 定数まとめ                    | kebab-case または `camelCase`（プロジェクトで統一） | `api-endpoints.ts`     |
+| テスト                        | `{対象}.test.tsx` または `__tests__/`               | `UserProfile.test.tsx` |
+
+### 変数・型
+
+- **interface / type（Props）**: `PascalCase` + `Props` / 意味のある名前 — `UserProfileProps`
+- **定数（モジュール横断）**: `UPPER_SNAKE_CASE`
+- **関数・変数**: `camelCase`
+- **boolean**: `is` / `has` / `can` / `should`
+- **イベントハンドラ（内部）**: `handleXxx`、props は `onXxx`
+- **`any` 禁止**。不明なら `unknown` + 型ガード、または具体ユニオン。
+
+### ディレクトリ
+
+- 機能・画面単位: **kebab-case** — `user-profile/`、`order-list/`
+- 動的ルートは **React Router** 導入後に `[id]` 等で揃える（未導入ならプレースホルダコメントで可）
+
+---
+
+## 共通コンポーネントに置く基準（`src/component/`）
+
+次を **すべて**満たすものだけを `component/` に置く（満たさないものは `features/` 配下）。
+
+1. **横断利用**: 原則 **3 つ以上**の異なる feature で実使用がある（または明確に再利用予定のデザインシステム粒）
+2. **高抽象度**: **ビジネスロジックを持たない**（API・ドメイン固有文言・業務フローを含めない）
+3. **単一責任**: 1 つの明確な UI 目的のみ
+
+```tsx
+// ✅ 良い例: 汎用 Button
+interface ButtonProps {
+  variant: "primary" | "secondary" | "danger";
+  size: "small" | "medium" | "large";
+  disabled?: boolean;
+  onClick?: () => void;
+  children: React.ReactNode;
+}
+
+// ❌ 悪い例: ドメインに依存
+const OrderSubmitButton = () => {
+  const { submitOrder } = useOrderContext();
+  return <button onClick={submitOrder}>注文確定</button>;
+};
+```
+
+---
+
+## 必須要求事項
+
+### 1. TypeScript 型安全性
+
+- **`any` 禁止**
+- 例: `type UserRole = 'admin' | 'user' | 'guest';`
+- 例: `if (typeof value === 'string') { ... }`
+
+### 2. インポートパス（`@/` 必須）
+
+- **`@/` は `src/` のエイリアス**として扱う。深い相対パス `../../../` は **禁止**。
+- ✅ `import { Button } from '@/component/ui/Button';`
+- ❌ `import { Button } from '../../../component/ui/Button';`
+- エイリアス未設定の場合は `vite.config.ts` の `resolve.alias` と `tsconfig.app.json` の `paths` を追加する（本リポジトリでは設定済みを前提）。
+
+### 3. React 19
+
+- `useState` / `useEffect` / `useContext` / `useMemo` / `useCallback` / `useId` を用途に応じて使用。
+- 再利用ロジックは **カスタムフック**（`hooks/` または `features/.../hooks`）に分離。
+- Context を使う場合は Provider の責務を分け、デフォルト値で undefined を握りつぶさない。
+
+```tsx
+// カスタムフック例
+function useUserData(userId: string) {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchUser(userId)
+      .then((u) => {
+        if (!cancelled) setUser(u);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [userId]);
+
+  return { user, loading };
+}
+```
+
+### 4. クライアントコンポーネント（Vite SPA）
+
+- **すべての画面コンポーネントはクライアントで実行**される。Next.js の Server Components は **ない**。
+- データ取得は **useEffect + fetch**、または **TanStack Query 等導入後**はそのキャッシュ層に集約。
+
+### 5. データ取得・非同期 UI
+
+- 一覧・詳細は **ローディング / 空 / エラー** の 3 状態を明示。
+- **Suspense** を使う場合はデータ取得と境界の組み合わせを React の推奨に沿う（ライブラリ導入後）。
+- **Error Boundary**（自前または `react-error-boundary` 等）で feature 単位のフォールバックを検討。
+
+```tsx
+// 例: エラー境界で囲む
+<ErrorBoundary fallback={<ListError />}>
+  <UserList />
+</ErrorBoundary>
+```
+
+### 6. API 通信
+
+- 生の `fetch` を各所に散らさない。**共通ラッパ**（例: `utils/api/apiRequest.ts`）を 1 箇所に置き、ベース URL・ヘッダ・エラーマッピングを集約。
+- ✅ `apiRequest.get(\`/api/users/${id}\`)` のようにラッパ経由
+- 認可エラー（401/403）とネットワークエラーを区別してユーザー向けメッセージに反映。
+
+#### API を追加するときのルール（本リポジトリ）
+
+**クライアント（本番・開発共通）**
+
+1. **呼び出し口**: `src/utils/api/apiRequest.ts` の `api` / `apiRequest` を使う。画面・フックに `fetch` を直書きしない。
+2. **URL**: 相対パスは **`/api/...`** を基本。ベース URL は **`VITE_API_BASE_URL`**（未設定時は同一オリジン）。同じパスを複数箇所で使うなら `@/constants/api-endpoints.ts` 等に **定数化**する。
+3. **型**: リクエスト／レスポンスの型は **`src/types/`** か **`features/<feature-name>/`** 側（例: `types.ts`）に置き、**`any` は使わない**。
+4. **置き場所**: ドメイン固有の「API 関数」（例: `getOrders`）はまず **`features/<kebab-name>/api.ts`** に置き、複数 feature から使うようになったら **`utils/api`** に薄いラッパとして昇格を検討する。
+
+**MSW（開発時モック、`main.tsx` で `import.meta.env.DEV` のみ起動）**
+
+1. **ファイル分割**: **`src/mocks/handlers/<リソース>.ts`** を追加し、  
+   `export const <resource>Handlers: RequestHandler[] = [ http.get(...), ... ]` とする。  
+   **1 ファイル＝1 リソース（または論理グループ）**を目安にし、肥大化したらメソッド別に分割してもよい。
+2. **集約**: **`src/mocks/handlers/index.ts`** で `import { <resource>Handlers } from '@/mocks/handlers/<リソース>'` し、  
+   `export const handlers` に **`...<resource>Handlers`** をマージする。**`browser.ts` は編集しない**（入口は `handlers/index.ts` のみ）。
+3. **パス整合**: ハンドラの URL は **クライアントが実際に叩くパスと一致**させる（`/api/...` や `VITE_API_BASE_URL` 付きになる場合は、MSW 側もワイルドカード・完全 URL 等で [MSW のマッチ規則](https://mswjs.io/docs/http/intercepting-requests) に合わせる）。
+4. **未実装リクエスト**: 既定は **`onUnhandledRequest: 'bypass'`**。モックが無い URL はネットワークへ流れる。バックエンド未接続で開発するエンドポイントには **必ずハンドラを足す**。
+
+### 7. スタイリング
+
+- **現状**: グローバル CSS（`App.css` / `index.css`）+ コンポーネント横 CSS を基本とする。
+- **MUI / Tailwind / CSS Modules を導入した場合**は、そのプロジェクトの既定に従う。
+- **インライン `style`** は動的な 1〜2 プロパティに限定し、レイアウトの主軸はクラスまたは CSS ファイルに寄せる（保守性）。
+
+### 8. エラーハンドリング
+
+- ユーザー向け: **トースト**（`react-hot-toast` 等、導入後）またはインラインアラート。
+- 開発者向け: `console.error` またはロガー。**空の catch 禁止**。
+- HTTP ステータスに応じたメッセージ分岐（404 / 409 / 500 等）。
+
+### 9. アクセシビリティ
+
+- **WCAG 2.1/2.2 の AA** を意識。セマンティック HTML、ラベル、キーボード操作、`aria-*` は [WAI-ARIA APG](https://www.w3.org/WAI/ARIA/apg/) に沿う。
+- 例: `aria-label` / `aria-describedby`、フォーカス可視、`button` と `a` の使い分け。
+
+### 10. パフォーマンス
+
+- 不必要な再レンダーを避ける。**`React.memo` / `useMemo` / `useCallback`** は計測または明確な理由があるときのみ（過剰使用は避ける）。
+- 大きなリストは **ページネーションまたは仮想化**（ライブラリ導入後）。
+
+### 11. テスタビリティ
+
+- **Vitest + Testing Library** 導入後: ユーザー視点のテスト、`data-testid` は必要最小限。
+- ビジネスロジックは **純関数 + フック** に分離しテストしやすくする。
+
+### 12. ハードコーディング禁止
+
+- **マジックナンバー**: 名前付き定数へ。
+- **ユーザー向け文言・ラベル**: `@/constants/messages` 等へ集約（i18n 導入後はキー化）。
+- **色**: `@/constants/colors`（または CSS 変数）で定義し、**Hex をコンポーネントに直書きしない**。
+
+```tsx
+// ✅
+const MAX_RETRY = 3;
+const MSG = { NOT_FOUND: "データが見つかりません" } as const;
+
+// ❌
+if (retry < 3) alert("データが見つかりません");
+```
+
+---
+
+## コード品質ゲート
+
+1. **ESLint**: `npm run lint` でエラー 0（警告も原則 0）
+2. **型チェック**: `npm run build`（`tsc -b`）で TypeScript エラー 0
+3. **Prettier** を導入したら `format:check` を CI / ローカルで通す
+
+---
+
+## AI の出力形式（コード生成を依頼されたとき）
+
+1. **完全な実装コード**（必要な import からコンポーネント定義まで）
+2. **型定義**（`interface` / `type`）
+3. **テスト**（テスト基盤がある場合は主要ケースのみ）
+4. **判断の短い説明**（なぜそのパターンか 2〜5 文）
+
+---
+
+## Web 標準・セキュリティ（短縮）
+
+- `main` ランドマーク 1 つ、見出し階層、フォームにラベル。
+- 認可の最終判断は **バックエンド**。フロントは UI の出し分けのみ。
+- XSS: ユーザー入力の HTML 挿入はサニタイズ必須。`dangerouslySetInnerHTML` は原則使わない。
+- 秘密は **`VITE_` に載せない**（公開バンドルに入る）。環境変数は `.env.example` でキーのみ共有。
+
+---
+
+## 参考リンク
+
+- [React 19](https://react.dev/)、[Vite](https://vite.dev/)、[TypeScript](https://www.typescriptlang.org/)
+- [MSW](https://mswjs.io/docs)（モックのリクエストマッチ・`http` / `HttpResponse`）
+- [WCAG 2.2](https://www.w3.org/TR/WCAG22/)、[MDN](https://developer.mozilla.org/)
