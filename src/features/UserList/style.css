@@ -71,6 +71,20 @@
   border-bottom: none;
 }
 
+.user-list__row--clickable {
+  cursor: pointer;
+  transition: background 0.12s;
+}
+
+.user-list__row--clickable:hover {
+  background: var(--row-hover);
+}
+
+.user-list__row--clickable:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;
+}
+
 .user-list__state {
   margin: 0;
   padding: 24px 0;

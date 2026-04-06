@@ -10,6 +10,19 @@ export const MESSAGES = {
     empty: '表示するユーザーがいません',
     errorPrefix: 'エラー: ',
   },
+  userDetail: {
+    modalAriaLabel: 'ユーザー詳細',
+    close: '閉じる',
+    loading: 'ユーザー情報を読み込んでいます…',
+    errorPrefix: 'エラー: ',
+    employeeId: '社員番号',
+    dateOfBirth: '生年月日',
+    salary: '月給',
+    rating: '評価ランク',
+    group: '所属グループ',
+    departmentHistory: '部署経歴',
+    present: '現在',
+  },
   dashstackTopBar: {
     searchLabel: 'Search',
     notificationsAria: (count: number) =>

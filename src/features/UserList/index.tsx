@@ -1,11 +1,22 @@
+import { useState } from 'react'
 import { MESSAGES } from '@/constants/messages'
 import { useUsers } from '@/features/UserList/hooks/useUsers'
+import { UserDetailModal } from '@/features/UserList/UserDetailModal'
 import './style.css'
 
 const MSG = MESSAGES.userList
 
 export default function UserList() {
   const result = useUsers()
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState<string | null>(null)
+
+  const handleRowClick = (employeeId: string) => {
+    setSelectedEmployeeId(employeeId)
+  }
+
+  const handleCloseModal = () => {
+    setSelectedEmployeeId(null)
+  }
 
   return (
     <main className="user-list" aria-label="ユーザー一覧ページ">
@@ -52,7 +63,20 @@ export default function UserList() {
               </thead>
               <tbody>
                 {result.users.map((u) => (
-                  <tr key={u.employeeId}>
+                  <tr
+                    key={u.employeeId}
+                    className="user-list__row--clickable"
+                    onClick={() => handleRowClick(u.employeeId)}
+                    tabIndex={0}
+                    role="button"
+                    aria-label={`${u.name} の詳細を表示`}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault()
+                        handleRowClick(u.employeeId)
+                      }
+                    }}
+                  >
                     <td>{u.employeeId}</td>
                     <td>{u.name}</td>
                     <td>{u.age}</td>
@@ -68,6 +92,11 @@ export default function UserList() {
           </div>
         )}
       </div>
+
+      <UserDetailModal
+        employeeId={selectedEmployeeId}
+        onClose={handleCloseModal}
+      />
     </main>
   )
 }

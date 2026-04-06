@@ -4,6 +4,28 @@
  */
 
 export interface paths {
+    "/users/{employeeId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                employeeId: string;
+            };
+            cookie?: never;
+        };
+        /**
+         * ユーザー詳細取得
+         * @description 指定した社員番号の詳細情報を返す。
+         */
+        get: operations["getUserDetail"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/users": {
         parameters: {
             query?: never;
@@ -33,6 +55,44 @@ export interface components {
          * @enum {string}
          */
         UserGroup: "エンジニア" | "経理" | "営業";
+        /**
+         * @description 評価ランク（A が最高）
+         * @enum {string}
+         */
+        UserRating: "A" | "B" | "C" | "D";
+        DepartmentHistory: {
+            /** @description 部署名 */
+            department: string;
+            /**
+             * @description 着任年月（YYYY-MM）
+             * @example 2018-04
+             */
+            from: string;
+            /**
+             * @description 離任年月（YYYY-MM）。null は現在在籍
+             * @example 2021-03
+             */
+            to: string | null;
+        };
+        UserDetail: {
+            /** @description 社員番号 */
+            employeeId: string;
+            /** @description 氏名 */
+            name: string;
+            /**
+             * Format: date
+             * @description 生年月日（YYYY-MM-DD）
+             * @example 1990-05-15
+             */
+            dateOfBirth: string;
+            /** @description 月給（円） */
+            salary: number;
+            rating: components["schemas"]["UserRating"];
+            /** @description 部署経歴（古い順） */
+            departmentHistory: components["schemas"]["DepartmentHistory"][];
+            group: components["schemas"]["UserGroup"];
+        };
+        GetUserDetailResponse: components["schemas"]["UserDetail"];
         User: {
             /**
              * @description 社員番号
@@ -91,6 +151,40 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    getUserDetail: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                employeeId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 取得成功 */
+            200: {
+                headers: { [name: string]: unknown };
+                content: {
+                    "application/json": components["schemas"]["GetUserDetailResponse"];
+                };
+            };
+            /** @description 該当ユーザーが存在しない */
+            404: {
+                headers: { [name: string]: unknown };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description サーバーエラー */
+            500: {
+                headers: { [name: string]: unknown };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     getUsers: {
         parameters: {
             query?: never;

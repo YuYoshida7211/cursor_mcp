@@ -19,8 +19,6 @@ export function useUsers(): UseUsersResult {
   useEffect(() => {
     let cancelled = false
 
-    setResult({ status: 'loading', users: null, error: null })
-
     api
       .get<GetUsersResponse>(USERS_PATH)
       .then(({ users }) => {
