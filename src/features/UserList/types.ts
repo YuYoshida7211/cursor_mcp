@@ -8,3 +8,7 @@ import type { components } from '@/types/api.generated'
 export type UserGroup = components['schemas']['UserGroup']
 export type User = components['schemas']['User']
 export type GetUsersResponse = components['schemas']['GetUsersResponse']
+export type UserRating = components['schemas']['UserRating']
+export type DepartmentHistory = components['schemas']['DepartmentHistory']
+export type UserDetail = components['schemas']['UserDetail']
+export type GetUserDetailResponse = components['schemas']['GetUserDetailResponse']

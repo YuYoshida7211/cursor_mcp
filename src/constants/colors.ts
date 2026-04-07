@@ -9,6 +9,9 @@ export const COLORS = {
   border: 'var(--border)',
   accent: 'var(--accent)',
   codeBg: 'var(--code-bg)',
+  primary: 'var(--primary)',
+  primaryHover: 'var(--primary-hover)',
+  rowHover: 'var(--row-hover)',
 } as const
 
 export type ColorToken = (typeof COLORS)[keyof typeof COLORS]

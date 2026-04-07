@@ -47,6 +47,41 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+  /users/{employeeId}:
+    get:
+      operationId: getUserDetail
+      summary: ユーザー詳細取得
+      description: 指定した社員番号の詳細情報を返す。
+      tags:
+        - users
+      parameters:
+        - name: employeeId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: 社員番号
+          example: E-1001
+      responses:
+        "200":
+          description: 取得成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetUserDetailResponse"
+        "404":
+          description: 該当ユーザーが存在しない
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: サーバーエラー
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
 components:
   schemas:
 
@@ -112,6 +147,76 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/User"
+
+    UserRating:
+      type: string
+      enum:
+        - A
+        - B
+        - C
+        - D
+      description: 評価ランク（A が最高）
+
+    DepartmentHistory:
+      type: object
+      required:
+        - department
+        - from
+      properties:
+        department:
+          type: string
+          description: 部署名
+          example: エンジニアリング部
+        from:
+          type: string
+          description: 着任年月（YYYY-MM）
+          example: "2018-04"
+        to:
+          type: string
+          nullable: true
+          description: 離任年月（YYYY-MM）。null は現在在籍
+          example: "2021-03"
+
+    UserDetail:
+      type: object
+      required:
+        - employeeId
+        - name
+        - dateOfBirth
+        - salary
+        - rating
+        - departmentHistory
+        - group
+      properties:
+        employeeId:
+          type: string
+          description: 社員番号
+          example: E-1001
+        name:
+          type: string
+          description: 氏名
+          example: 山田 太郎
+        dateOfBirth:
+          type: string
+          format: date
+          description: 生年月日（YYYY-MM-DD）
+          example: "1990-05-15"
+        salary:
+          type: integer
+          description: 月給（円）
+          example: 450000
+        rating:
+          $ref: "#/components/schemas/UserRating"
+        departmentHistory:
+          type: array
+          description: 部署経歴（古い順）
+          items:
+            $ref: "#/components/schemas/DepartmentHistory"
+        group:
+          $ref: "#/components/schemas/UserGroup"
+
+    GetUserDetailResponse:
+      $ref: "#/components/schemas/UserDetail"
 
     ErrorResponse:
       type: object
